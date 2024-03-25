@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Sidebar</title>
+</head>
+<body>
+
+<div th:fragment="sidebar" class="bg-light min-vh-100">
+    <div class="sidebar-sticky">
+        <ul class="nav flex-column nav-pills">
+            <li class="nav-item p-2">
+                <a class="nav-link text-success mt-5" data-bs-toggle="pill" href="#home"><i
+                        class="fa fa-home"></i>Home</a>
+            </li>
+            <li class="nav-item p-2">
+                <a class="nav-link text-success mt-2" data-bs-toggle="pill" href="#products"><i
+                        class="fa fa-database"></i>Products</a>
+            </li>
+            <li class="nav-item p-2">
+                <a class="nav-link text-success mt-2" data-bs-toggle="pill" href="#addProduct"><i
+                        class="fa fa-plus"></i>Add Product</a>
+            </li>
+            <li class="nav-item p-2">
+                <a class="nav-link text-success mt-2" data-bs-toggle="pill" href="#searchProduct"><i
+                        class="fa fa-search"></i>Search Product</a>
+            </li>
+            <li class="nav-item p-2">
+                <a class="nav-link text-success mt-2" data-bs-toggle="pill" href="#removeProduct"><i
+                        class="fa fa-trash"></i>Remove Product</a>
+            </li>
+        </ul>
+    </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"> 
+
+<head> 
+	<meta charset="UTF-8"> 
+	<meta name="viewport" content="width=device-width, initial-scale=1"> 
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"> 
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css"> 
+	<link rel="shortcut icon" href="https://cdn-icons-png.flaticon.com/512/7656/7656409.png"> 
+	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script> 
+	<title>Inventory Management System</title> 
+</head> 
+
+<style> 
+	@import url('https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@1,800&display=swap'); 
+
+	body { 
+		font-weight: 600 !important; 
+		overflow-x: hidden; 
+	} 
+
+	.navbar-brand { 
+		font-family: 'Noto Serif', serif; 
+		margin-left: 1rem; 
+		color: white !important; 
+		font-weight: 700; 
+		font-size: x-large !important; 
+	} 
+
+	.nav-link { 
+		font-weight: 600; 
+		font-size: 16px !important; 
+	} 
+
+	.nav-link:active, 
+	.nav-link.active { 
+		background-color: #198754 !important; 
+		color: white !important; 
+	} 
+
+	.nav-link:hover { 
+		color: white !important; 
+		background-color: #198754 !important; 
+	} 
+
+	.content { 
+		padding: 15px; 
+	} 
+
+	::placeholder { 
+		font-size: 14px; 
+		font-weight: 400; 
+		font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif; 
+	} 
+
+	td { 
+		font-size: 13px; 
+	} 
+
+	label { 
+		font-family: 'Noto Serif', serif; 
+	} 
+</style> 
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Person</title>
+</head>
+<body>
+    <h2>Edit Person</h2>
+    
+    <form action="#" th:action="@{/products/{id}/updateProduct(id=${product.id})}" th:object="${product}" method="post">
+        <!-- <input type="hidden" th:field="*{id}"/>
+        <label for="name">Name:</label>
+        <input type="text" id="name" th:field="*{name}"/><br/>
+        <label for="age">price</label>
+        <input type="text" id="price" th:field="*{price}"/><br/> -->
+        <div class="col-sm-3 offset-sm-1 p-2"> 
+            <label>product Category</label> 
+            <select th:field="*{category}" class="form-select mt-3" required> 
+                <option value=""></option> 
+                <option value="Electronics">Electronics</option> 
+                <option value="Fashion">Fashion</option> 
+                <option value="Furniture">Furniture</option> 
+                <option value="Home&Kitchen">Home & Kitchen</option> 
+                <option value="Grocery">Grocery</option> 
+            </select> 
+        </div> 
+        <div class="col-sm-3 offset-sm-1 p-2"> 
+            <label>product Name</label> 
+            <input type="text" th:field="*{name}" class="form-control mt-3" required 
+                placeholder="name of the product"> 
+        </div> 
+        <div class="col-sm-3 offset-sm-1 p-2"> 
+            <label>product Rating</label> 
+            <select th:field="*{rating}" class="form-select mt-3" required> 
+                <option value=""></option> 
+                <option value="1">1</option> 
+                <option value="2">2</option> 
+                <option value="3">3</option> 
+                <option value="4">4</option> 
+                <option value="5">5</option> 
+            </select> 
+        </div> 
+    </div> 
+    
+        <div class="col-sm-3 offset-sm-1 p-2"> 
+            <label>product Quantity</label> 
+            <input type="number" th:field="*{quantity}" class="form-control mt-3" required 
+            placeholder="Number of Items Available"> 
+        </div>
+        <div class="col-sm-3 offset-sm-1 p-2"> 
+            <label>product Price</label> 
+            <input type="text" th:field="*{price}" class="form-control mt-3" required 
+            placeholder="Name your price"> 
+        </div> 
+        
+   
+        <button type="submit" class="btn btn-success text-light" style="margin-left: 7rem;">Update 
+            Product</button> 
+    </form>
+</body>
+</html>

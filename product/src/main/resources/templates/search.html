@@ -1,0 +1,28 @@
+<form action="#" th:action="@{/search}" th:object="${employeeSearchFormData}" method="post">
+
+      
+    <div alight="left">
+        <tr>
+            <label class="form-label" >Employee ID</label>
+            <td>
+                <input type="text" th:field="*{employeeId}" class="form-control" placeholder="Employee ID" />
+            </td>
+        </tr>
+     </div>   
+
+        <br>
+        <tr>
+        <td colspan="2"><button type="submit" class="btn btn-info">Search</button> </td>
+        </tr>
+        
+        
+        <div alight="left">
+        <tr>
+            <label class="form-label" >Employee Name</label>
+            <td>
+              
+                <input type="text" th:field="${employee.ename}" class="form-control" placeholder="Employee Name" />
+            </td>
+        </tr>
+     </div>   
+</form>
