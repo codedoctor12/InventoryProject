@@ -60,6 +60,16 @@
 	label { 
 		font-family: 'Noto Serif', serif; 
 	} 
+	.warehouse-icon {
+            width: 100px;
+            height: 100px;
+            display: inline-block;
+            margin: 10px;
+            cursor: pointer;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
 </style> 
 
 <body> 
@@ -236,6 +246,7 @@
 								</div> 
 							</div> 
 					</div>  -->
+					
 					<div class="tab-pane fade" id="products"> 
 						<h4 class="text-success p-2">All Products Data</h4> 
 						<div class="table-responsive mt-5"> 
@@ -251,7 +262,7 @@
 								</thead> 
 								<tbody> 
 									<tr th:each="product, index : ${products}" > 
-										<td th:text="${product.id}"></td> 
+										<td th:text="${index.index + 1}"></td> 
 										<td th:text="${product.category}"></td> 
 										<td th:text="${product.name}"></td> 
 										<td th:text="${product.rating}"></td> 
@@ -264,7 +275,14 @@
 								</tbody> 
 							</table> 
 						</div> 
+						
+
+							
 					</div> 
+					
+				
+
+				
 					<div class="tab-pane fade" id="addProduct"> 
 						<h4 class="text-success p-2">Add New Product</h4> 
 						<br> 
@@ -325,6 +343,7 @@
 								<br> 
 								<button type="submit" class="btn btn-success text-light" style="margin-left: 7rem;">Add 
 									Product</button> 
+									
 							</form> 
 						</div> 
 
@@ -336,7 +355,7 @@
 							<form class="p-1" th:action="@{/searchProduct}" th:object="${product}" method="post" > 
 								<div class="row"> 
 									<div class="col-sm-9 offset-sm-1"> 
-										<input type="number" name="id" th:field="*{id}" class="form-control" required 
+										<input type="text" name="id" th:field="*{category}" class="form-control" required 
 											placeholder="Product ID"
 											style="text-align: center; border-radius: 30px; border: 2px solid green;">
 											
@@ -344,9 +363,19 @@
 									</div> 
 
 									<div class="col-sm-2"> 
+										 
 										<button type="POST" class="btn btn-success"
 											style="border-radius: 20px;">Search Product</button> 
-									</div> 
+											<select th:field="*{category}" required> 
+												<option  value=""></option> 
+												<option  value="Name">Name</option> 
+												<option  value="Category">Category</option> 
+												<option  value="Rating">Rating</option> 
+											</select> 
+											
+									</div>
+									
+						
 								</div> 
 								<br> 
 								<div id="foundProduct" th:if="${foundProduct}" th:object="${product}"> 
@@ -365,34 +394,24 @@
 												</tr>
 											</thead>
 											<tbody>
-												<tr th:each="foundProduct : ${foundProduct}">
-													<td th:text="${foundProduct.id}"></td> 
-													<td th:text="${foundProduct.category}"></td> 
-													<td th:text="${foundProduct.name}"></td> 
-													<td th:text="${foundProduct.rating}"></td> 
-													<td th:text="${foundProduct.quantity}"></td> 
-													<td th:text="${foundProduct.price}"></td> 
-													<td th:text="${foundProduct.sn}"></td> 
+												<tr th:each="product, index : ${foundProduct}" > 
+													<td th:text="${index.index + 1}"></td> 
+													<td th:text="${product.category}"></td> 
+													<td th:text="${product.name}"></td> 
+													<td th:text="${product.rating}"></td> 
+													<td th:text="${product.quantity}"></td> 
+													<td th:text="${product.price}"></td> 
+													<td th:text="${product.sn}"></td> 
 													<td width="10%">
-														 <a th:href="@{/products/{id}/edit(id=${foundProduct.id})}">Edit</a> |
-														<form th:action="@{/products/{id}/delete(id=${foundProduct.id})}" method="post">
-															<input type="submit" value="Delete"/>
-														</form>
-													</td>
-													<!-- </tr>
-														<td><input type="text" style="display: none;" th:value="${foundProduct.id}" name="id" /></td>
-														<td><input class="editable"  contenteditable="true" th:text="${foundProduct.category}"   id="category" /></td>
-														<td><input type="text" th:value="${foundProduct.name}" name="name" /></td>
-														<td><input type="text" th:value="${foundProduct.rating}" name="rating" /></td>
-														<td><input type="text" th:value="${foundProduct.quantity}" name="quantity" id="quantity" /></td>
-														<td><input type="text" th:value="${foundProduct.sn}" name="sn" /></td>
-
-														<td>
-															<button  type="button" th:onclick="updateProduct([[${foundProduct.id}]],[[*{category}]],[[${foundProduct.name}]],[[${foundProduct.rating}]],[[${foundProduct.quantity}]],[[${foundProduct.price}]])">Update</button>
-															<p id="displayText"></p> -->
-
-					
-														</td>
+														<a th:href="@{/products/{id}/edit(id=${product.id})}">Edit</a> |
+													   <form th:action="@{/products/{id}/delete(id=${product.id})}" method="post">
+														   <input type="submit" value="Delete"/>
+													   </form>
+												   </td>
+			
+												</tr> 
+													
+													
 														<script>
 															
 																// Attach event listener for input change
@@ -404,9 +423,8 @@
 																// Attach event listener for input change
 																document.getElementById('category').addEventListener('input', handleInputChange);
 														</script>
-													</tr>
+													
 												
-												</tr> 
 											</tbody> 
 										</table> 
 									
@@ -423,32 +441,44 @@
 							</form> 
 						</div> 
 					</div> 
-					<div class="tab-pane fade" id="wareHouse"> 
-						<h4 class="text-success p-2">WareHouse Data</h4> 
-						<div class="table-responsive mt-5"> 
-							<table class="table table-hover table-bordered"> 
-								<thead class="bg-success text-light"> 
-									<th>Name</th> 
-									<th>Location</th> 
-									<th>Products</th> 
-								</thead> 
-								<tbody> 
-									<tr th:each="warehouse, index : ${warehouses}" > 
-										<td th:text="${warehouse.name}"></td> 
-										<td th:text="${warehouse.location}"></td> 
-										<td th:text="${warehouse.productList}"></td> 
-
-									</tr> 
+					<div class="tab-pane fade"  id="wareHouse">
+						<h1>Choose The Warehouse</h1>
+						<table class="table table-hover table-bordered"> 
+							<thead class="bg-success text-light"> 
+								<th>Name</th>
+								<th>Location</th>
+								<th>Link To Products</th>
+							</thead> 
+							<tbody> 
+								<tr th:each="warehouse, index : ${warehouses}" > 
+									<td th:text="${warehouse.name}"></td>
+									<td th:text="${warehouse.location}"></td>
+									<td><img th:src="' https://cdn-icons-png.flaticon.com/512/407/407826.png'" th:alt="${warehouse.name}" th:title="${warehouse.name}"
+										class="warehouse-icon"
+										th:data-warehouseid="${warehouse.id}"
+										th:data-warehousename="${warehouse.name}"
+										onclick="redirectToWarehouse(this)"></td> 
 									
-								</tbody> 
-							</table> 
-						</div> 
-					</div> 
-
-				</div> 
+	
+								</tr> 
+								
+							</tbody> 
+						</table> 
+						
+							<script>
+								function redirectToWarehouse(element) {
+									var warehouseId = element.getAttribute("data-warehouseid");
+									var warehouseName = element.getAttribute("data-warehousename");
+									// Redirect to the warehouse details page or perform any desired action
+									alert("Clicked on warehouse with ID: " + warehouseId + " and Name: " + warehouseName);
+									// window.location.href = '/warehouse/' + warehouseId;
+								}
+							</script>
+					</div>
 				</div>
-					
+
 			</div>
+					
 			<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
 							<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 							<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script> 

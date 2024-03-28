@@ -77,7 +77,7 @@
         <div class="col-sm-3 offset-sm-1 p-2"> 
             <label>product Category</label> 
             <select th:field="*{category}" class="form-select mt-3" required> 
-                <option value=""></option> 
+                <option th:value="${product.category}" th:text="${product.category}"></option> 
                 <option value="Electronics">Electronics</option> 
                 <option value="Fashion">Fashion</option> 
                 <option value="Furniture">Furniture</option> 

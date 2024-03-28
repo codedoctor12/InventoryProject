@@ -1,5 +1,7 @@
 package com.inventory.product.dto;
 
+import com.inventory.product.model.WareHouse;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,5 +19,6 @@ public class ProductResponse {
     private String price;
     private String rating;
     private String quantity;
-    private Long wareHouseId;
+    private WareHouse wareHouse;
+
 }

@@ -2,6 +2,7 @@ package com.inventory.product.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import com.inventory.product.repository.*;
@@ -41,6 +42,7 @@ public class ProductService
     public ProductResponse mapToResponse(Product product)
     {
          ProductResponse productResponse = ProductResponse.builder()
+         .id(product.getId())
          .name(product.getName())
          .price(product.getPrice())
          .quantity(product.getQuantity())
@@ -53,9 +55,41 @@ public class ProductService
 
 
     }
-    public void updateProduct(ProductRequest productRequest)
+    public ProductResponse findById(Long id)
+    {
+        Optional <Product> product = productRepository.findById(id);
+        if(product.isPresent())
+        {
+            ProductResponse productResponse = ProductResponse.builder()
+                .id(product.get().getId())
+                .name(product.get().getName())
+                .category(product.get().getCategory())
+                .price(product.get().getPrice())
+                .rating(product.get().getRating())
+                .sn(product.get().getSn())
+                .wareHouse(product.get().getWareHouse())
+                .quantity(product.get().getQuantity())
+                .build();
+            return productResponse;
+        }
+        else
+        {
+            return null;
+        }
+    }
+    public void updateProduct(ProductRequest productRequest,Long id)
     {
         
+        Product product = Product.builder()
+        .id(id)
+        .name(productRequest.getName())
+        .category(productRequest.getCategory())
+        .price(productRequest.getPrice())
+        .rating(productRequest.getRating())
+        .quantity(productRequest.getQuantity())
+        .sn(productRequest.getSn())
+        .build();
+    productRepository.save(product);
     }
 
 }
