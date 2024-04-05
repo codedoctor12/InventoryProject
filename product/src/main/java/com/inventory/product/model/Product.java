@@ -12,7 +12,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import com.inventory.product.model.WareHouse;
+import lombok.ToString;
 
 
 
@@ -32,9 +32,9 @@ public class Product {
     private String price;
     private String rating;
     private String quantity;
-     @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.MERGE)
     @JoinColumn(name = "warehouse_id")
-    private WareHouse wareHouse;
-
+    private WareHouse warehouse;
+     
 
 }

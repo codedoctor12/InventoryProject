@@ -1,6 +1,4 @@
-package com.inventory.product.model;
-
-import java.util.List;
+package com.inventory.product.dto;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
@@ -15,20 +13,18 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Entity
-@Table(name="warehouse")
+
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class WareHouse {
+public class WareHouseDTO {
 @Id
 @GeneratedValue(strategy=GenerationType.IDENTITY)
 private Long id;
 private String name;
 private String capacity;
 private String location;
-   @OneToMany(fetch = FetchType.LAZY, mappedBy = "warehouse", cascade = CascadeType.ALL)
-    private List<Product> productList;
+   
 
 }

@@ -7,9 +7,11 @@ import java.util.Random;
 
 import org.hibernate.cache.spi.support.AbstractReadWriteAccess.Item;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,87 +24,81 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.inventory.product.dto.ProductRequest;
 import com.inventory.product.dto.ProductResponse;
+import com.inventory.product.dto.WareHouseDTO;
 import com.inventory.product.model.Product;
 import com.inventory.product.model.WareHouse;
 import com.inventory.product.repository.ProductRepository;
 import com.inventory.product.repository.WareHouseRepository;
 import com.inventory.product.service.ProductService;
-import com.inventory.product.service.WareHouseService;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 
-@Controller
+@RestController
+@RequestMapping("/data")
+@CrossOrigin("http://127.0.0.1:5500/") 
 @RequiredArgsConstructor
 public class ProductController {
     private final ProductService productService;
-    @Autowired
-    private final WareHouseRepository wareHouseRepository;
+    
 
     
     @Autowired
     private final ProductRepository productRepository;
-  
-    @RequestMapping("/")
-    public String displayText(Model model)
+    @Autowired
+    private final WareHouseRepository wareHouseRepository;
+    private WareHouse wareHouse;
+    
+    @GetMapping
+    public ResponseEntity<List<WareHouseDTO>> displayText(Model model)
      {
-       List<Product> products  = productRepository.findAll();
-
-    //    model.addAttribute("products", products); 
-    //    model.addAttribute("product", new Product());
-       List<WareHouse> entities  = wareHouseRepository.findAll();
-       model.addAttribute("warehouses", entities); 
-       model.addAttribute("warehouse", new WareHouse());
-       System.out.println(entities);
-    //    WareHouse wareHouse = new WareHouse();
-    //    WareHouse wareHouse2 = new WareHouse();
-
-    //    wareHouse.setName("Main");
-    //    wareHouse.setLocation("California");
-    //    wareHouse2.setName("South");
-    //    wareHouse2.setLocation("New York");
-    //    wareHouseRepository.save(wareHouse);
-    //    wareHouseRepository.save(wareHouse2);
-
-    //    List<WareHouse> war = wareHouseRepository.findAll();
-    //    model.addAttribute("warehouses", war); 
-    //    model.addAttribute("warehouse", new WareHouse());
-    //    ModelAndView modelAndView = new ModelAndView();
-    //     modelAndView.setViewName("index");
-        return "wareHouse";
+       List<WareHouseDTO> products  = productService.getWareHouses();
+       System.out.println(products);
+        return  new ResponseEntity<List<WareHouseDTO>>(products, HttpStatus.OK);
 
         
-         // Thymeleaf template name
-    }
-    @RequestMapping("/index/{id}")
-    public String getWareHouseProducts(@PathVariable Long id, Model model,RedirectAttributes redirectAttributes)
-    {
-        ArrayList<ProductResponse> fProducts = new ArrayList<>();
-        List<ProductResponse> foundProduct = productService.getAllProducts();
-        for(ProductResponse prod : foundProduct)
-        {
-            if(prod.getWareHouse().getId().equals(id))
-            {
-                fProducts.add(prod);
-            }
-        }
         
-        redirectAttributes.addFlashAttribute("foundProduct", fProducts); 
-        model.addAttribute("foundProduct", redirectAttributes);
-        return "index";
     }
- 
+    @GetMapping("/products/{id}")
+    public ResponseEntity<List<ProductResponse>> getProducts(@PathVariable("id") String id)
+     {
+
+        Long l_id = Long.parseLong(id);
+       Optional<WareHouse> wareHouse = wareHouseRepository.findById(l_id);
+       if(wareHouse.isPresent())
+       {
+            this.wareHouse=wareHouse.get();
+            List<ProductResponse> products = productService.converToResponse(wareHouse.get().getProductList());
+            return  new ResponseEntity<List<ProductResponse>>(products, HttpStatus.OK);
+       }
+       else
+       {
+         return null;
+       }
+        
+
+        
+        
+    }
+
     @PostMapping("/newProduct")
-    public String saveProduct(@ModelAttribute("product") ProductRequest product, RedirectAttributes redirectAttributes)
+    public ResponseEntity<ProductRequest> saveProduct(@RequestBody ProductRequest product, RedirectAttributes redirectAttributes)
     {
+        String cap = this.wareHouse.getCapacity();
+        int capacity = Integer.parseInt(cap);
+        if(capacity==this.wareHouse.getProductList().size())
+        {
+            return null;
+        }
         String productId = "PD" + (1000 + new Random().nextInt(9000)); 
         product.setSn(productId);
-        productService.saveNewProduct(product);
+        System.out.println(product);
+        productService.saveNewProduct(product,this.wareHouse);
         redirectAttributes.addFlashAttribute("insertSuccess", true); 
-        return "redirect:/"; 
+
+         return new ResponseEntity<ProductRequest>(product,HttpStatus.OK); 
     }
   
     @DeleteMapping(path = "/{id}")
@@ -112,95 +108,53 @@ public class ProductController {
         productRepository.deleteById(l_Id);
         return "redirect:/inventory"; 
     }
-    @PostMapping("/searchProduct") 
-    public String searchProduct(@ModelAttribute("product") ProductRequest product, RedirectAttributes redirectAttributes, Model model) 
+    @GetMapping("/searchProduct/{id}") 
+    public ResponseEntity<List<ProductResponse>> searchProduct(@PathVariable("id") String sKeyWord, RedirectAttributes redirectAttributes, Model model) 
     { 
-        String searchBy = product.getCategory();
-        // System.out.println("Search By: "+searchBy);
-        String [] inputs = searchBy.split(",");
-        // System.out.println("Categroy "+inputs[0]+ " Text Input "+inputs[1]);
-        ArrayList<ProductResponse> fProducts = new ArrayList<>();
-        List<ProductResponse> foundProduct = productService.getAllProducts();
-        for(ProductResponse prod : foundProduct)
-        {
-            if(prod.getCategory().equals(inputs[0])||prod.getName().equals(inputs[0]))
+        List<Product> products = new ArrayList<Product>();
+  
+        for(Product p : this.wareHouse.getProductList()){
+
+            if(p.getName().startsWith(sKeyWord))
             {
-                fProducts.add(prod);
-                
+                products.add(p);
             }
         }
-        // Long l_id = Long.parseLong(id);
-        // List<Product> foundProduct = productRepository.findAll();
-        // for(Product product:foundProduct)
-        // {
-        //     if(product.getId()==l_id)
-        //     {
-        //        
-        //     }
-        // }
-       
-        //     redirectAttributes.addFlashAttribute("notFound", true);
-        //     model.addAttribute("notFound", redirectAttributes);
-        redirectAttributes.addFlashAttribute("foundProduct", fProducts); 
-        model.addAttribute("foundProduct", redirectAttributes);
-        return "redirect:/";
+        return  new ResponseEntity<List<ProductResponse>>(productService.converToResponse(products), HttpStatus.OK);
 
-       
-        
     }
-    @GetMapping("/products/{id}/edit")
-    public String editPerson(@PathVariable Long id, Model model) {
-        ProductResponse optionalProduct = productService.findById(id);
-        if (optionalProduct!=null) {
-            model.addAttribute("product", optionalProduct);
-            return "edit";
-        } else {
-            return "redirect:/inventory";
-        }
-    }
-    @SuppressWarnings("null")
     @PostMapping("/products/{id}/updateProduct")
-    public String updateProduct(@PathVariable Long id, @ModelAttribute("product") ProductRequest updatedProduct) {
-        @SuppressWarnings("null")
-        Optional<Product> optionalProduct = productRepository.findById(id);
+    public ResponseEntity<List<ProductRequest>> updateProduct(@PathVariable String id, @RequestBody ProductRequest updatedProduct)
+     {
+        if(id==null)
+        {
+
+            
+
+        }
+
+        Long lId = Long.parseLong(id);
+        Optional<Product> optionalProduct = productRepository.findById(lId);
+        List<ProductRequest> prodR= new ArrayList<>();
         if(optionalProduct.isPresent())
         {
-           productService.updateProduct(updatedProduct, id);
+            System.out.println(updatedProduct);
+            productService.updateProduct(updatedProduct, lId,optionalProduct.get().getSn(),this.wareHouse);
+            prodR.add(updatedProduct);
+           return new ResponseEntity<List<ProductRequest>>(prodR,HttpStatus.OK);
 
         }
         else
         {
-            return "product Not found!";
+            return  null;
         }
-        return "redirect:/";
     }
-    @RequestMapping("/wareHouses")
-    public String wareHouseView(Model model)
-    {
-        List<WareHouse> entities  = wareHouseRepository.findAll();
-       model.addAttribute("warehouses", entities); 
-       model.addAttribute("warehouse", new WareHouse());
-
-        return "wareHouse";
-    }
-
-    // @PutMapping("/{id}")
-    // public ResponseEntity<Product> updateItem(@PathVariable String id, @RequestBody Product newItemData) {
+    @SuppressWarnings("null")
+    @DeleteMapping("/product")
+    public ResponseEntity<Product> deleteMovie(@RequestBody Product product ) {
+        productRepository.delete(product);
+        return ResponseEntity.noContent().build();
         
-    // }
-    // @PostMapping("/searchProduct") 
-    // public String searchProduct(@RequestParam(name = "id") String id, RedirectAttributes redirectAttributes, 
-    //         Model model) { 
-    //     Optional<Product> foundProduct = productService.getProductById(id); 
-    //     model.addAttribute("product", new Product()); 
-    //     if (foundProduct.isPresent()) { 
-    //         redirectAttributes.addFlashAttribute("foundProduct", foundProduct); 
-    //     } else { 
-    //         redirectAttributes.addFlashAttribute("notFound", true); 
-    //     } 
-  
-    //     return "redirect:/"; 
-    // } 
-
+    }
 
 }
